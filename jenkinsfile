@@ -1,0 +1,51 @@
+pipeline{
+    agent{
+        label 'worker'
+    }
+    
+    tools{
+
+        maven 'maven'
+        sonar 'sonar'
+    }
+
+    environment{
+        My_aws_cred = credentials('aws-cred')
+    }
+
+    stages{
+        stage('checkout'){
+            steps{
+
+                git 'https://github.com/sakshipatode235-ai/studentapp-ui.git'
+            }
+        }
+        stage ('build'){
+            steps{
+
+                sh 'mvn clean package'
+            }
+            post {
+                success{
+                    archiveArtifacts studentapp: '**/target/*.war' , fingerprint:true
+                }
+            }
+        }
+        stage('Artifact to s3'){
+            steps{
+
+                sh ' aws s3 cp target/*war s3://argurate.spacee/artifact/student.war'
+            }
+
+        }
+        stage('SonarQube-Analysis'){
+            steps{
+                withSonarQubeEnv('sonar'){
+                    sh'mvn sonar:sonar'
+
+                }
+                sh'mvn sonar:sonar'
+            }
+        }
+    }
+}
