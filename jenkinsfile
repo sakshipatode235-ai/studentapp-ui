@@ -76,7 +76,7 @@ pipeline{
          stage('Deploy to Kubernetes') {
             steps {
                 sh '''
-                aws eks update-kubeconfig --name my-cluster-mp --region us-west-2
+                aws eks update-kubeconfig --name my-cluster-mayur --region us-east-2
                 kubectl apply -f calc-deployment-svc.yaml
                 kubectl get all
                 '''
